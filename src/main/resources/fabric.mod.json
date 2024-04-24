@@ -1,30 +1,28 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "quickreload",
   "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Quick Reload Mod",
+  "description": "The mod reloads the current world automatically",
   "authors": [
-    "Me!"
+    "Crafterdark"
   ],
   "contact": {
-    "homepage": "https://legacyfabric.net/",
-    "sources": "https://github.com/Legacy-Fabric/fabric-example-mod"
   },
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "MIT",
+  "icon": "assets/quickreload/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "net.fabricmc.mod.QuickReloadMod"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "quickreload.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.19",
-    "minecraft": "1.8.9"
+    "fabricloader": ">=0.11.1",
+    "minecraft": "1.12.2"
   },
   "suggests": {
     "another-mod": "*"
