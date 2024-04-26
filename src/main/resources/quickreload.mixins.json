@@ -4,6 +4,7 @@
   "package": "net.fabricmc.mod.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "GameMenuScreenMixin"
   ],
   "client": [
   ],
