@@ -2,52 +2,22 @@ package net.fabricmc.mod;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.world.SaveHandler;
-import net.minecraft.world.level.storage.WorldSaveException;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class QuickReloadWaitingScreen extends Screen
 {
+    private static final Logger LOGGER = LogManager.getLogger();
+    public static boolean SafeReloadAfterSavingChunks;
+    private final String currentLevelName;
 
-    SaveHandler currentSaveHandler;
-
-    public QuickReloadWaitingScreen(SaveHandler saveHandler)
+    public QuickReloadWaitingScreen(String levelName)
     {
-        currentSaveHandler = saveHandler;
+        currentLevelName = levelName;
     }
 
     public void init() {
         this.buttons.clear();
-
-        Thread currentWorldThread = new Thread(){
-            public void run(){
-                while (true)
-                {
-                    if (assertDoesNotThrow(currentSaveHandler))
-                    {
-                    client.setScreen(new TitleScreen());
-                    return;
-                    }
-                    else 
-                    {
-                        System.out.println("Access denied");
-                    }
-                }
-            }
-        };
-
-        currentWorldThread.run();
-    }
-
-    public boolean assertDoesNotThrow(SaveHandler saveHandler)
-    {
-        try{
-            saveHandler.readSessionLock();
-            return true;
-        }
-        catch(WorldSaveException worldSaveException){
-            return false;
-        }
     }
 
     public void render(int mouseX, int mouseY, float tickDelta) {
@@ -59,5 +29,22 @@ public class QuickReloadWaitingScreen extends Screen
     public boolean shouldPauseGame() {
         return false;
     }
-}
 
+    @Override
+    public void tick(){
+        super.tick();
+        if (SafeReloadAfterSavingChunks){
+            SafeReloadAfterSavingChunks = false;
+            if (this.client.getCurrentSave().levelExists(currentLevelName)) {
+                LOGGER.info("Reloaded current level: " + currentLevelName);
+                this.client.startIntegratedServer(currentLevelName, currentLevelName, null);
+            }
+            else
+            {
+                LOGGER.info("Couldn't reload current level: " + currentLevelName);
+                LOGGER.info("Going to main menu...");
+                this.client.setScreen(new TitleScreen());
+            }
+        }
+    }
+}
