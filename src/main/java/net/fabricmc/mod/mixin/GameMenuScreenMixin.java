@@ -23,67 +23,28 @@ public abstract class GameMenuScreenMixin extends Screen
 		this.buttons.add(new ButtonWidget(8, this.width / 2 - 100, this.height / 4 + 120 + 8, "Quick Reload"));
 	}
 
-    @Override
-    public void buttonClicked(ButtonWidget button)
+    @Inject(at = @At("TAIL"), method = "buttonClicked")
+    private void init(ButtonWidget button, CallbackInfo info)
     {
-        switch (button.id) {
-            case 0: {
-                this.client.setScreen(new SettingsScreen(this, this.client.options));
-                break;
+        if (button.id == 8)
+        {
+            boolean IWasServerIntegratedRunning = this.client.isIntegratedServerRunning();
+            button.active = false;
+
+            String levelName = Objects.requireNonNull(this.client.getServer()).getLevelName();
+
+            this.client.world.disconnect();
+            this.client.connect((ClientWorld)null);
+
+            QuickReloadWaitingScreen.SafeReloadAfterSavingChunks = false;
+
+            if (IWasServerIntegratedRunning)
+            {
+                this.client.setScreen(new QuickReloadWaitingScreen(levelName));
             }
-            case 1: {
-                boolean bl = this.client.isIntegratedServerRunning();
-                boolean bl2 = this.client.isConnectedToRealms();
-                button.active = false;
-                this.client.world.disconnect();
-                this.client.connect(null);
-                if (bl) {
-                    this.client.setScreen(new TitleScreen());
-                    break;
-                }
-                if (bl2) {
-                    RealmsBridge realmsBridge = new RealmsBridge();
-                    realmsBridge.switchToRealms(new TitleScreen());
-                    break;
-                }
+            else
+            {
                 this.client.setScreen(new MultiplayerScreen(new TitleScreen()));
-                break;
-            }
-            case 4: {
-                this.client.setScreen(null);
-                this.client.closeScreen();
-                break;
-            }
-            case 5: {
-                this.client.setScreen(new AdvancementsScreen(this.client.player.networkHandler.method_14672()));
-                break;
-            }
-            case 6: {
-                this.client.setScreen(new StatsScreen(this, this.client.player.getStatHandler()));
-                break;
-            }
-            case 7: {
-                this.client.setScreen(new OpenToLanScreen(this));
-            }
-            case 8: {
-                boolean IWasServerIntegratedRunning = this.client.isIntegratedServerRunning();
-                button.active = false;
-
-                String levelName = Objects.requireNonNull(this.client.getServer()).getLevelName();
-
-                this.client.world.disconnect();
-                this.client.connect((ClientWorld)null);
-
-                QuickReloadWaitingScreen.SafeReloadAfterSavingChunks = false;
-
-                if (IWasServerIntegratedRunning)
-                {
-                    this.client.setScreen(new QuickReloadWaitingScreen(levelName));
-                }
-                else
-                {
-                    this.client.setScreen(new MultiplayerScreen(new TitleScreen()));
-                }
             }
         }
     }

@@ -10,6 +10,7 @@ public class QuickReloadWaitingScreen extends Screen
     private static final Logger LOGGER = LogManager.getLogger();
     public static boolean SafeReloadAfterSavingChunks;
     private final String currentLevelName;
+    public int safeTicksBeforeMenu;
 
     public QuickReloadWaitingScreen(String levelName)
     {
@@ -24,10 +25,6 @@ public class QuickReloadWaitingScreen extends Screen
         this.renderDirtBackground(0);
         this.drawCenteredString(this.textRenderer, "Reloading world...", this.width / 2, this.height / 2 - 50, 16777215);
         super.render(mouseX, mouseY, tickDelta);
-    }
-
-    public boolean shouldPauseGame() {
-        return false;
     }
 
     @Override
@@ -45,6 +42,13 @@ public class QuickReloadWaitingScreen extends Screen
                 LOGGER.info("Going to main menu...");
                 this.client.setScreen(new TitleScreen());
             }
+        }
+
+        if (safeTicksBeforeMenu++ == 600)
+        {
+            LOGGER.info("TIMED OUT from current level: " + currentLevelName);
+            LOGGER.info("Going to main menu...");
+            this.client.setScreen(new TitleScreen());
         }
     }
 }
